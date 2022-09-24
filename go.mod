@@ -1,4 +1,4 @@
-module github.com/vano2903/ipaas-org/utils
+module github.com/ipaas-org/utils
 
 go 1.19
 
