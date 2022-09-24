@@ -12,9 +12,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
 var (
