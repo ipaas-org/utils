@@ -110,11 +110,11 @@ func TestGetUserAndNameFromRepoUrl(t *testing.T) {
 	}
 }
 
-func TestConnectToDB(t *testing.T) {
+func TestConnectToMongo(t *testing.T) {
 	testUri := ""
-	u := NewUtil(context.Background(), testUri)
+	u := NewUtil(context.Background(), testUri, "", "", "")
 	assertions := assert.New(t)
-	connection, err := u.ConnectToDB()
+	connection, err := u.ConnectToMongo()
 	assertions.NoError(err)
 
 	defer func(client *mongo.Client, ctx context.Context) {
