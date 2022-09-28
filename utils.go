@@ -14,6 +14,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-redis/redis"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -218,14 +219,23 @@ func GetLastCommitHash(url, branch string) {
 type Util struct {
 	ctx                   context.Context
 	databaseConnectionUri string
+	redisPassword         string
+	redisHost             string
+	redisPort             string
 }
 
-func NewUtil(ctx context.Context, databaseConnectionUri string) *Util {
-	return &Util{ctx: ctx, databaseConnectionUri: databaseConnectionUri}
+func NewUtil(ctx context.Context, databaseConnectionUri, redisPassword, redisHost, redisPort string) *Util {
+	return &Util{
+		ctx:                   ctx,
+		databaseConnectionUri: databaseConnectionUri,
+		redisPassword:         redisPassword,
+		redisHost:             redisHost,
+		redisPort:             redisPort,
+	}
 }
 
 // ConnectToDB returns a connection to the ipaas database
-func (u Util) ConnectToDB() (*mongo.Database, error) {
+func (u Util) ConnectToMongo() (*mongo.Database, error) {
 	//get context
 	ctx, cancel := context.WithTimeout(u.ctx, 10*time.Second)
 	defer cancel()
@@ -237,4 +247,19 @@ func (u Util) ConnectToDB() (*mongo.Database, error) {
 	}
 
 	return client.Database("ipaas"), nil
+}
+
+func (u Util) ConnectToRedis() (*redis.Client, error) {
+	//try to connect
+	client := redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%s", u.redisHost, u.redisPort),
+		Password: u.redisPassword,
+		DB:       0,
+	})
+	_, err := client.Ping().Result()
+	if err != nil {
+		return nil, err
+	}
+
+	return client, nil
 }
